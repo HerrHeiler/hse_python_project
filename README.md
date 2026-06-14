@@ -7,18 +7,28 @@ a repo for final python project in data analysis done during first-year studies 
 ## 1 - clone repository
 ```bash
    git clone https://github.com/HerrHeiler/hse_python_project.git
-   cd hse_python_projet
+   cd hse_python_project
 ```
 
 ## 2 - create and activate virtual environment
+- MacOs/Linux
 ```bash
    python3 -m venv .venv
    source .venv/bin/activate
 ```
-
+- Windows
+```bash
+   python -m venv .venv
+   .venv\Scripts\activate
+```
 ## 3 - install requirements
+- MacOs/Linux
 ```bash
    pip3 install -r requirements.txt
+```
+- Windows
+```bash
+   pip install -r requirements.txt
 ```
 
 # Launch - from root
