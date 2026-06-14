@@ -255,7 +255,7 @@ elif section == "Data Quality":
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
-    sns.histplot(df["Total_Hours"], bins=30, kde=True, ax=axes[0], color="skyblue")
+    sns.histplot(df["Total_Hours"], bins=1, kde=True, ax=axes[0], color="skyblue")
     axes[0].axvline(x=24, color="red", linestyle="--", linewidth=2, label="24 hours")
     axes[0].axvline(
         x=24 - tolerance,
