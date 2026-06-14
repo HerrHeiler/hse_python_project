@@ -225,8 +225,15 @@ elif section == "Outliers Analysis":
     col1, col2, col3 = st.columns([2, 2, 2])
 
     with col1:
-        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-        selected_col = st.selectbox("Select column:", numeric_cols, index=4)
+        outlier_cols = [
+            "Study_Hours_Per_Day",
+            "Extracurricular_Hours_Per_Day",
+            "Sleep_Hours_Per_Day",
+            "Social_Hours_Per_Day",
+            "Physical_Activity_Hours_Per_Day",
+            "Grades",
+        ]
+    selected_col = st.selectbox("Select column:", outlier_cols, index=4)
 
     with col2:
         st.metric(
