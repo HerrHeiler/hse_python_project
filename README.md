@@ -21,14 +21,15 @@ a repo for final python project in data analysis done during first-year studies 
    pip3 install -r requirements.txt
 ```
 
-## Launch
+## Launch - from root
 
 # - Streamlit
 ```bash
   streamlit run apps/streamlit_app.py
 ```
-
+go to http://localhost:8501/
 # - FastAPI
 ```bash
-  uvicorn apps.api:app --reload
+  uvicorn apps.api:app --reload --port 8000
 ```
+go to http://127.0.0.1:8000/docs#/ for swagger
