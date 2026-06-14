@@ -43,3 +43,18 @@ go to http://localhost:8501/
   uvicorn apps.api:app --reload --port 8000
 ```
 go to http://127.0.0.1:8000/docs#/ for swagger
+
+## Note
+
+### API Sleep Mode (Free Tier)
+
+The API is hosted on Render's free tier which has some limitations where API falls asleep after 15 mins of inactivity
+
+What to do:
+If you see "API is not running" - wait 30-60 seconds and refresh
+(or open `/docs` endpoint to wake up the API manually)
+
+Endpoints:
+- API: https://student-api-hse.onrender.com
+- Swagger Docs: https://student-api-hse.onrender.com/docs
+- Dashboard: https://student-dashboard-xyz.onrender.com

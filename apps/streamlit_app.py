@@ -1,4 +1,5 @@
 import os
+import tempfile
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -216,6 +217,114 @@ elif section == "Data Quality":
             st.warning(f"Found {total_dups} duplicate rows")
             with st.expander("Show duplicate rows"):
                 st.dataframe(df[df.duplicated()], use_container_width=True)
+    # check for sum is 24
+    st.markdown("###  Time Validation Check (24 hours)")
+
+    time_cols = [
+        "Study_Hours_Per_Day",
+        "Extracurricular_Hours_Per_Day",
+        "Sleep_Hours_Per_Day",
+        "Social_Hours_Per_Day",
+        "Physical_Activity_Hours_Per_Day",
+    ]
+
+    df["Total_Hours"] = df[time_cols].sum(axis=1)
+
+    tolerance = 0.5
+    valid_mask = (df["Total_Hours"] >= 24 - tolerance) & (
+        df["Total_Hours"] <= 24 + tolerance
+    )
+
+    valid_count = valid_mask.sum()
+    invalid_count = (~valid_mask).sum()
+    invalid_percentage = (invalid_count / len(df)) * 100
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Total Records", len(df))
+    col2.metric("Valid (≈24h)", valid_count)
+    col3.metric("Invalid", invalid_count)
+    col4.metric("Invalid %", f"{invalid_percentage:.2f}%")
+
+    st.markdown("#### Total Hours Distribution")
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Mean", f"{df['Total_Hours'].mean():.2f}h")
+    col2.metric("Median", f"{df['Total_Hours'].median():.2f}h")
+    col3.metric("Min", f"{df['Total_Hours'].min():.2f}h")
+    col4.metric("Max", f"{df['Total_Hours'].max():.2f}h")
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+    sns.histplot(df["Total_Hours"], bins=30, kde=True, ax=axes[0], color="skyblue")
+    axes[0].axvline(x=24, color="red", linestyle="--", linewidth=2, label="24 hours")
+    axes[0].axvline(
+        x=24 - tolerance,
+        color="orange",
+        linestyle=":",
+        linewidth=1.5,
+        label=f"±{tolerance}h tolerance",
+    )
+    axes[0].axvline(x=24 + tolerance, color="orange", linestyle=":", linewidth=1.5)
+    axes[0].set_title("Distribution of Total Hours", fontsize=12, fontweight="bold")
+    axes[0].set_xlabel("Total Hours")
+    axes[0].set_ylabel("Count")
+    axes[0].legend()
+
+    sns.boxplot(data=df, y="Total_Hours", ax=axes[1], color="coral")
+    axes[1].axhline(y=24, color="red", linestyle="--", linewidth=2)
+    axes[1].set_title("Total Hours Boxplot", fontsize=12, fontweight="bold")
+    axes[1].set_ylabel("Total Hours")
+
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.close()
+
+    if invalid_count > 0:
+        st.warning(
+            f"Found **{invalid_count} records** where total hours ≠ 24 (±{tolerance}h)"
+        )
+
+        with st.expander(f"🔍 View {invalid_count} invalid records"):
+            invalid_df = df[~valid_mask][time_cols + ["Total_Hours"]].copy()
+            invalid_df["Difference"] = invalid_df["Total_Hours"] - 24
+            st.dataframe(
+                invalid_df.sort_values("Difference", ascending=False),
+                use_container_width=True,
+            )
+
+            st.markdown("#### Deviation Statistics")
+            col1, col2, col3 = st.columns(3)
+            col1.metric(
+                "Max Over",
+                f"+{invalid_df[invalid_df['Difference'] > 0]['Difference'].max():.2f}h",
+            )
+            col2.metric(
+                "Max Under",
+                f"{invalid_df[invalid_df['Difference'] < 0]['Difference'].min():.2f}h",
+            )
+            col3.metric("Mean Deviation", f"{invalid_df['Difference'].mean():+.2f}h")
+    else:
+        st.success("All records have total hours ≈ 24 (±0.5h)")
+
+    if invalid_count > 0:
+        st.markdown("---")
+        st.markdown("#### Actions")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("Show only valid records", use_container_width=True):
+                st.session_state.show_valid_only = True
+                st.rerun()
+
+        with col2:
+            if st.button("Remove invalid records", use_container_width=True):
+                df = df[valid_mask].copy()
+                df = df.drop(columns=["Total_Hours"])
+                st.success(f"Removed {invalid_count} invalid records")
+                st.info("Note: Changes are temporary (in-memory only)")
+                st.rerun()
+
 
 # Block 3: Outliers analysis
 elif section == "Outliers Analysis":
