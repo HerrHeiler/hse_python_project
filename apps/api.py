@@ -1,3 +1,5 @@
+import os
+import tempfile
 from pathlib import Path
 
 import pandas as pd
@@ -8,7 +10,17 @@ app = FastAPI(title="Student Lifestyle API")
 
 BASE_DIR = Path.cwd()
 RAW_PATH = BASE_DIR / "data" / "raw" / "student_lifestyle_dataset.csv"
-NEW_ENTRIES_PATH = BASE_DIR / "data" / "new_entries" / "new_students.csv"
+
+ON_RENDER = os.getenv("RENDER", "false").lower() == "true"
+
+if ON_RENDER:
+    TEMP_DIR = Path(tempfile.gettempdir())
+    NEW_ENTRIES_PATH = TEMP_DIR / "new_entries" / "new_students.csv"
+else:
+    BASE_DIR = Path(__file__).parent.parent
+    NEW_ENTRIES_PATH = BASE_DIR / "data" / "new_entries" / "new_students.csv"
+
+NEW_ENTRIES_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 df = pd.read_csv(RAW_PATH)
 
