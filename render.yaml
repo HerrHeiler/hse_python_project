@@ -1,0 +1,25 @@
+services:
+  # FastAPI
+  - type: web
+    name: student-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn apps.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    
+  # Streamlit 
+  - type: web
+    name: student-dashboard
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run apps/streamlit_app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: API_URL
+        fromService:
+          name: student-api
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL

@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -8,6 +9,8 @@ import seaborn as sns
 import streamlit as st
 from scipy import stats
 from scipy.stats import f_oneway, kruskal, mannwhitneyu
+
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
 
 
 def st_cats():
@@ -742,15 +745,16 @@ elif section == "Descriptive Statistics":
 
 # Block 7: API integration
 elif section == "API Integration":
+    st.info(f" API URL: `{API_URL}`")
     st.markdown('<p class="sub-header">🐼 FastAPI REST API</p>', unsafe_allow_html=True)
     try:
-        stats_response = requests.get("http://127.0.0.1:8000/statistics", timeout=2)
+        stats_response = requests.get(f"{API_URL}/statistics", timeout=2)
         api_connected = stats_response.status_code == 200
     except requests.RequestException:
         api_connected = False
 
     if api_connected:
-        st.success("**API Connected** — http://127.0.0.1:8000")
+        st.success(f"**API Connected** — {API_URL}/")
 
         tab1, tab2, tab3 = st.tabs(["🐼 View Data", "🐼 Add Student", "🐼 Statistics"])
 
@@ -790,7 +794,7 @@ elif section == "API Integration":
 
                 try:
                     response = requests.get(
-                        "http://127.0.0.1:8000/students", params=params, timeout=5
+                        f"{API_URL}/students", params=params, timeout=5
                     )
 
                     if response.status_code == 200:
@@ -858,7 +862,7 @@ elif section == "API Integration":
 
                     try:
                         response = requests.post(
-                            "http://127.0.0.1:8000/students", json=payload, timeout=5
+                            f"{API_URL}/students", json=payload, timeout=5
                         )
 
                         if response.status_code == 200:
@@ -879,9 +883,7 @@ elif section == "API Integration":
 
         if st.button("🐼 Clear all new entries", type="secondary"):
             try:
-                response = requests.delete(
-                    "http://127.0.0.1:8000/students/clear-new", timeout=5
-                )
+                response = requests.delete(f"{API_URL}/students/clear-new", timeout=5)
                 if response.status_code == 200:
                     st.success("All new entries cleared")
                     st.info("🐼 Refresh the page to see updated data.")
@@ -895,9 +897,7 @@ elif section == "API Integration":
 
             if st.button("🐼 Refresh Statistics", type="primary"):
                 try:
-                    response = requests.get(
-                        "http://127.0.0.1:8000/statistics", timeout=5
-                    )
+                    response = requests.get(f"{API_URL}/statistics", timeout=5)
 
                     if response.status_code == 200:
                         stats = response.json()
