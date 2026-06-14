@@ -2,33 +2,33 @@
 a repo for final python project in data analysis done during first-year studies at hse
 
 
-## Installment
+# Installment
 
-# 1 - clone repository
+## 1 - clone repository
 ```bash
    git clone https://github.com/HerrHeiler/hse_python_project.git
    cd hse_python_projet
 ```
 
-# 2 - create and activate virtual environment
+## 2 - create and activate virtual environment
 ```bash
    python3 -m venv .venv
    source .venv/bin/activate
 ```
 
-# 3 - install requirements
+## 3 - install requirements
 ```bash
    pip3 install -r requirements.txt
 ```
 
-## Launch - from root
+# Launch - from root
 
-# - Streamlit
+## - Streamlit
 ```bash
   streamlit run apps/streamlit_app.py
 ```
 go to http://localhost:8501/
-# - FastAPI
+## - FastAPI
 ```bash
   uvicorn apps.api:app --reload --port 8000
 ```
